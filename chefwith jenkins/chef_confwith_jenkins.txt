@@ -1,0 +1,189 @@
+﻿
+
+
+how to trigger chef recipe on node using jenkins.
+
+Chef- is a configuration management tool .
+         Configuration management tool - it is a method through which we automate admin tasks and turns code into infrastructure.
+So your code will be repeatable,testable , versionable.
+
+Chef is a pull based tool.
+Pull based- Nodes check with the server Perodically and fetches the configuration from it .
+Chef is written in Ruby language.
+
+Advantage of Chef:-
+Complete automation
+Improve performance
+reduce cost
+
+Components of Chef ( chef architecture)
+Workstation - Workstations are personal computers or virtual servers where all configuration code is created ,tested or changed.  Workstation communicates with the chef server using a knife.
+Knife is a command line tool that uploads the cookbook to the server. Tool to establish communication among workstation, server and node knife is a CLI tool that runs on workstation.
+
+Chef-server oR Server- The chef-server is a middle-man between workstation and the nodes.
+It stores cookbooks, roles, environments and other resources.
+
+Node- apply the code. Nodes are the systems that require the configuration.
+Node communicate with the chef-server using the chef-client.
+Each node can have a different configuhration required.Chef-client is installed on every node.
+
+Chef-client- to update the machine and take the code from server and transfer with node.
+
+
+Cookbook is like a code of recipe .A cookbook is a collection of resources (recipes).
+
+Recipe is a file that contains a set of instructions (resources) to be executed.
+
+ 
+Configuration part:
+
+ Installation Command of chef 
+
+wget https://packages.chef.io/files/stable/chef-workstation/21.10.640/el/8/chef-workstation-21.10.640-1.el8.x86_64.rpm
+
+yum localinstall chef-workstation-21.10.640-1.el8.x86_64.rpm
+
+chef -v
+
+
+
+
+.yum install tree -y (install tree)
+amazon-linux-extras install java-openjdk11 (install java) on node and workstation 
+cd cookbooks/
+chef generate cookbook test-cookbook (create the cookbook)
+cd test-cookbook/
+chef generate recipe test-recipe (create recipe)
+vi test-cookbook/recipes/test-recipe.rb (write the cookbook and recipe)
+chef exec ruby -c test-cookbook/recipes/test-recipe.rb (check the code and syntax)
+chef-client -zr "recipe[test-cookbook::test-recipe]" (run the cookbook and recipe)
+knife ssl check (check connection btw workstation and chef-server)
+knife upload cookbook priya_cookbook(upload cookbook)
+knife cookbook list (see the list of uploaded cookbook)
+knife node show nod1(see the node details)
+knife bootstrap 3.140.240.119 --ssh-user ec2-user --sudo -i ohiokey1.pem  -N node1(connect to node)
+knife node run_list set node1 "recipe[priya-cookbook::test-recipe](attach the recipe to node)
+chef-client
+  
+
+Started with chef-server and node 
+
+1. firstly create one account in chef-server.
+2. then attach your workstation to chef-server.
+3. Upload your cookbooks from workstation to chef-server.
+4. Attach node to chef-server via bootstrap process.
+5.Apply cookbooks from chef-server to node using knife .
+
+
+Some recipe-
+
+1.file '/root/1.txt' do
+  content 'give me feedback'
+  action :create
+end
+2.file '/home/ec2-user/priya' do
+  content 'priya  is not only gorgeous also she is kind hearted'
+end
+3.package 'httpd' do
+action :install
+end
+
+file '/var/www/html/index.html' do
+content 'Give me feedback'
+action :create
+end
+
+
+
+
+
+Jenkins installation for amazon linux
+
+yum update -y
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+sudo amazon-linux-extras install java-openjdk11
+java --version
+yum install jenkins
+jenkins --version
+systemctl enable jenkins
+systemctl start jenkins
+systemctl status jenkins
+
+ created jenkins slave  one for node one for workstation
+  inside node 
+  remote path  -   /home/ec2-user/
+   no of exec- 1
+  same for workstation
+
+
+
+shell script- A shell script is a text file that contains a sequence of commands for a UNIX-based operating system.  Shell Scripts are written using text editors
+Shell scripting is an important part of process automation in Linux
+
+why we used shell?
+
+Shell helps in doing work which is repetitive in nature. When executing a bunch of commands, often, shells can take all these commands directly from a stored file and execute it.instead of writing them again every time.
+
+
+Jenkins pipeline of node configuration
+
+pipeline{
+    agent{
+        label "chef-client"
+      }
+    stages{
+        stage("running chef-client"){
+            steps{
+            sh "sudo chef-client"
+        }
+        }
+    }
+}
+
+
+
+
+jenkins pipeline of workstation configuration 
+
+pipeline{
+    agent {
+        label "workstation"
+        
+    }
+    stages{
+        stage("running shell script for chef-client"){
+        steps{
+          
+            sh "sudo su"
+            sh "sh ./chef.sh"
+          
+        }
+        }
+        
+    }
+}
+
+
+shell scripting file - /home/ec2-user/workspace/workstation inside this path create shell file
+
+cat chef.sh 
+#!/bin/bash
+
+# Entering into cookbook directory
+cd /home/ec2-user/chef-repo/cookbooks
+
+#uploading cookbook to chef-server
+knife upload cookbook .
+
+#uploading cookbook to node
+knife node run_list set node1 "recipe[priya_cookbook::apache-recipe]"
+
+
+
+
+
+
+
+
+
