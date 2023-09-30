@@ -1,0 +1,72 @@
+Chef- is a configuration management tool .
+Configuration management tool - it is a method through which we automate
+admin tasks and turns code into infrastructure.
+Configuration management tool turns your code into infrastructure.
+So your code will be repeatable,testable , versionable.
+Chef is a pull based tool.
+Pull based- Nodes check with the server Perodically and fetches the configuration
+from it .
+Chef is written in Ruby language.
+Advantage of Chef:-
+Complete automation
+Improve performance
+reduce cost
+Components of Chef ( chef architecture)
+Workstation - Workstations are personal computers or virtual servers where all
+configuration code is created ,tested or changed. Workstation communicates with the
+chef server using a knife.
+Knife is a command line tool that uploads the cookbook to the server. Tool to
+establish communication among workstation, server and node knife is a CLI tool that
+runs on workstation.
+Chef-server oR Server- The chef-server is a middle-man between workstation and
+the nodes.
+It stores cookbooks, roles, environments and other resources.
+Node- apply the code. Nodes are the systems that require the configuration.
+Node communicate with the chef-server using the chef-client.
+Each node can have a different configuration required.Chef-client is installed on
+every node.
+Chef-client- to update the machine and take the code from server and transfer with
+node.
+Cookbook is like a code of recipe .A cookbook is a collection of resources (recipes).
+Recipe is a file that contains a set of instructions (resources) to be executed.Configuration part:
+Installation Command of chef
+wget https://packages.chef.io/files/stable/chef-workstation/21.10.640/el/8/chef-
+workstation-21.10.640-1.el8.x86_64.rpm
+yum localinstall chef-workstation-21.10.640-1.el8.x86_64.rpm
+chef -v
+.yum install tree -y (install tree)
+amazon-linux-extras install java-openjdk11 (install java) on node and workstation
+cd cookbooks/
+chef generate cookbook test-cookbook (create the cookbook)
+cd test-cookbook/
+chef generate recipe test-recipe (create recipe)
+vi test-cookbook/recipes/test-recipe.rb (write the cookbook and recipe)
+chef exec ruby -c test-cookbook/recipes/test-recipe.rb (check the code and syntax)
+chef-client -zr "recipe[test-cookbook::test-recipe]" (run the cookbook and recipe)
+knife ssl check (check connection btw workstation and chef-server)
+knife upload cookbook priya_cookbook(upload cookbook)
+knife cookbook list (see the list of uploaded cookbook)
+knife node show nod1(see the node details)
+knife bootstrap 3.140.240.119 --ssh-user ec2-user --sudo -i ohiokey1.pem -N
+node1(connect to node)
+knife node run_list set node1 "recipe[priya-cookbook::test-recipe](attach the recipe to
+node)
+chef-client
+Jenkins installation for amazon linux
+yum update -y
+sudo wget -O /etc/yum.repos.d/jenkins.repo
+https://pkg.jenkins.io/redhat-stable/jenkins.reposudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+sudo amazon-linux-extras install java-openjdk11
+java --version
+yum install jenkins
+jenkins --version
+systemctl enable jenkins
+systemctl start jenkins
+systemctl status jenkins
+shell script- A shell script is a text file that contains a sequence of commands for a
+UNIX-based operating system. Shell Scripts are written using text editors
+Shell scripting is an important part of process automation in Linux
+why we used shell?
+Shell helps in doing work which is repetitive in nature. When executing a bunch of
+commands, often, shells can take all these commands directly from a stored file and
+execute it.instead of writing them again every time.
